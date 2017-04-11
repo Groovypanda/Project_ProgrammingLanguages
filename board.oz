@@ -10,8 +10,9 @@ export
    getRowSize: GetRowSize
    isInBoundaries: IsInBoundaries
    getNeighbouringTiles: GetNeighbouringTiles
+   print: PrintBoard 
 import 
-   Browser(browse:Browse)
+   System(printInfo: Print)
 define
 
   /*Initialise a list of length N with value Value*/
@@ -113,13 +114,23 @@ define
       {List.filter [{GetTile Board Coord.x+Direction Coord.y} {GetTile Board Coord.x+Direction Coord.y-1} {GetTile Board Coord.x+Direction Coord.y+1}] fun {$ Tile} {Not Tile==nil} end}
    end 
 
-
-   %Board = {CreateBoard 5 5 }
-   %{Browse Board}
-   %Tiles = {BoardToTiles Board}
-   %{Browse {FilterTiles Tiles white}}
-   %{Browse {GetNeighbouringTiles Board coord(x:1 y:1) 1}}
-   %{Browse {GetRow Board 1}}
-   %{Browse {IsValidMove Board start(x:3 y:2) dest(x:3 y:3)}}
-   %{Browse {DoMove Board coord(x:1 y:1) coord(x:2 y:1)}}
+   proc {PrintBoard Board}
+      for I in 1..{GetColumnSize Board} do 
+         {Print ' '}
+      end 
+      {Print '\n '}
+      for Row in Board do 
+         for Tile in Row do 
+            case Tile of empty then {Print '- '}
+            [] black then {Print 'b '}
+            [] white then {Print 'w '}
+            end 
+         end 
+         {Print '\n '}
+      end 
+      for I in 1..{GetColumnSize Board} do 
+         {Print ' '}
+      end 
+      {Print '\n\n'}
+   end 
 end 

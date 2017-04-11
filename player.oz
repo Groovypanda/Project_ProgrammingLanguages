@@ -1,41 +1,34 @@
 functor 
 export
-   new: PlayerThread
-   calculateMove: CalculateMove
+   createPlayer: CreatePlayer
 import 
-   System
-   BoardFunc at './board.ozf'
    Rules at './rules.ozf'
-   Browser(browse:Browse)
    OS
 define
    
-   proc {PlayerThread PlayerStream RefPort Color}
-      local ReadStream HandlePMessage in 
-         proc {ReadStream PlayerStream}
-            case PlayerStream
-               of X|Xs then {HandlePMessage X} {ReadStream Xs}
-               else skip
-            end 
-         end 
-         proc {HandlePMessage Message}
-                     {System.printInfo 6}
-            {Port.send RefPort message(color: Color board:Message.board move: {CalculateMove Message.board Color})}
-         end 
-         {ReadStream PlayerStream}
+   fun {CreatePort Proc}
+      Stream in 
+         thread for Message in Stream do {Proc Message} end 
       end 
+      {Port.new Stream}
+   end 
+
+   fun {CreatePlayer Referee Color}
+      {CreatePort proc {$ Msg}
+         case Msg of chooseSize() then 
+            {Port.send Referee setSize(3 3)}
+         [] doMove(GameBoard Attempt) then
+            {Port.send Referee checkMove(GameBoard {CalculateMove GameBoard Color} Color (Attempt+1))}            
+         end 
+      end}  
    end 
 
    fun {CalculateMove Board Color}
       /*Return a random possible move*/
-      {List.nth {Rules.getValidMoves Board Color} {OS.rand} mod 5 + 1}
+      local PossibleMoves in 
+         PossibleMoves = {Rules.getValidMoves Board Color} 
+         {List.nth PossibleMoves {OS.rand} mod {List.length PossibleMoves} + 1}
+      end 
    end 
 
-   Board = {BoardFunc.createBoard 5 5}
-   fun {GenerateBoards I N}
-      {Delay 500}
-      if I<N then message(board: {BoardFunc.createBoard 5 5})|{GenerateBoards I+1 N}
-      else nil end
-   end 
-   %{Browse {PlayerThread {GenerateBoards 1 5} white}}
 end 

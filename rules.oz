@@ -8,7 +8,6 @@ import
 define
 
 	fun {GetValidMoves Board Type}
-
 		local CreateValidMoves TilesToMoves in
 			fun {TilesToMoves Start Dests}
 				{List.map Dests fun {$ Dest} move(start: Start dest: Dest) end}
@@ -62,8 +61,8 @@ define
       local Other in 
          Other = {BoardFunc.getType Board Coord.x Coord.y}
          case Other of empty then false 
-            [] black then Type==black 
-            [] white then Type==white 
+            [] black then Type==white
+            [] white then Type==black 
             else false 
          end 
       end 
