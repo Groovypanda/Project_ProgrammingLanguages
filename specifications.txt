@@ -1,0 +1,28 @@
+Expected input from player for referee: 
+---------------------------------------
+
+- setSize(N M):
+
+This function sets the size of the gameboard. 
+N: height of board, M: width of board
+
+- checkMove(Move): 
+
+Checks the move given by the player, if the move is correct it will be submitted on the board.
+Move is a tuple which looks like this: move(start: coord(x y) dest: coord(x y)) 
+This tuple contains a start coordinate and destination coordinate. These coordinates each contain an x and y value.
+
+Expected input from referee to player: 
+---------------------------------------
+
+- chooseSize(): 
+
+Let the player choose the size.
+
+- doMove(GameBoard):
+
+Let the player calculate a move. 
+GameBoard: A 2-dimensional list in which each value is an atom. This atom should be black, white or empty. 
+
+
+ 
