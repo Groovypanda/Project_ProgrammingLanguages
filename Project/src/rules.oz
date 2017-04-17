@@ -4,7 +4,6 @@ export
 	isValidMove: IsValidMove
 import 
 	BoardFunc at './board.ozf'
-   	Browser(browse:Browse)
 define
 
 	fun {GetValidMoves Board Type}

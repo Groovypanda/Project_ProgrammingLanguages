@@ -2,6 +2,7 @@ functor
 export
    createPlayer: CreatePlayer
 import 
+   System(printInfo: Print)
    Board at './Board.ozf'
    Rules at './rules.ozf'
    OS
@@ -14,21 +15,29 @@ define
       {NewPort Sin}
    end 
 
-   fun {CreatePlayer Referee Color Tactic}
+   fun {CreatePlayer Referee Color}
       {CreatePort proc {$ Msg}
-         case Msg of chooseSize() then 
+         case Msg 
+         of chooseSize() then 
             {Send Referee setSize(4 4)}
+         [] chooseK(GameBoard) then
+            local MaxK in
+               MaxK = {IntToFloat {Board.getColumnSize GameBoard}}/2.0
+               {Send Referee setK({FloatToInt {Floor MaxK}})} 
+            end 
+         [] removePawn(GameBoard) then 
+            {Send Referee removePawn({List.nth {GetPawns GameBoard Color} 1})}
          [] doMove(GameGameBoard) then
-            {Send Referee checkMove({CalculateMove GameGameBoard Color Tactic})}            
+            {Send Referee checkMove({CalculateMove GameGameBoard Color})}            
          end 
       end}  
    end 
 
-   fun {CalculateMove GameBoard Color Tactic}
+   fun {CalculateMove GameBoard Color}
       /*Return a random possible move*/
       local PossibleMoves in 
          PossibleMoves = {Rules.getValidMoves GameBoard Color} 
-         if Tactic == random then 
+         if Color == white then 
             {List.nth PossibleMoves {OS.rand} mod {List.length PossibleMoves} + 1}
          else 
             local GetBestMove in 
@@ -85,7 +94,11 @@ define
    end 
 
    fun {GetEnemies GameBoard Color}
-      {Board.filterTiles {Board.toTiles GameBoard} {GetOpponent Color}}
+      {GetPawns GameBoard {GetOpponent Color}}
+   end 
+
+   fun {GetPawns GameBoard Color}
+      {Board.filterTiles {Board.toTiles GameBoard} Color}
    end 
 
    fun {GetNearestEnemyDistance GameBoard Coord Color}

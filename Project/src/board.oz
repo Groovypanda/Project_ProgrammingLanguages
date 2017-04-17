@@ -4,6 +4,7 @@ export
    getTile: GetTile
    getType: GetType 
    submitMove: SubmitMove
+   removePawn: RemovePawn
    toTiles: BoardToTiles
    filterTiles: FilterTiles
    getColumnSize: GetColumnSize
@@ -76,6 +77,10 @@ define
       TmpBoard = {SetType Board Move.dest.x Move.dest.y {GetType Board Move.start.x Move.start.y}}
       {SetType TmpBoard Move.start.x Move.start.y empty}
       end 
+   end 
+
+   fun {RemovePawn Board Pawn}
+   	{SetType Board Pawn.x Pawn.y empty}
    end 
 
    fun {BoardToTiles Board}

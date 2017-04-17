@@ -16,22 +16,36 @@ define
       end 
    end 
    
-
    fun {CreateReferee PlayerWhite PlayerBlack}
       {Send PlayerBlack chooseSize()} 
-      {NewPortObject state(turn: white invalid: false) fun {$ State Msg}
-         case Msg of setSize(N M) then 
+      {NewPortObject state(turn: white invalid: false i: 0) fun {$ State Msg}
+         case Msg 
+         of setSize(N M) then 
             local GameBoard in 
                GameBoard = {Board.createBoard N M}
-               {Send PlayerWhite doMove(GameBoard)}
+               {Send PlayerWhite chooseK(GameBoard)}
                {SetBoard State GameBoard}
+            end 
+         [] setK(K) then
+            if K>0 then {Send PlayerWhite removePawn(State.board)} end 
+            {SetK State K}
+         [] removePawn(Pawn) then 
+            %If the type of the pawn is not correct, no pawn will be removed. Players shouldn't cheat...
+            local GameBoardUpdated in 
+               if Pawn.type == State.turn then GameBoardUpdated = {Board.removePawn State.board Pawn} else GameBoardUpdated = State.board end 
+               if {GetRemovedPawnsAmount State} < 2*State.k-1 then 
+                  if State.turn == white then {Send PlayerBlack removePawn(GameBoardUpdated)} else {Send PlayerWhite removePawn(GameBoardUpdated)} end 
+               else
+                  {Send PlayerWhite doMove(GameBoardUpdated)}
+               end 
+               {IncrementPawnsRemoved {SetTurn {SetBoard State {Board.removePawn GameBoardUpdated Pawn}} {GetOpponent State.turn}}}
             end 
          [] checkMove(Move) then 
             local Valid GameBoardUpdated in 
                Valid = {CheckMove State.board Move State.turn}
                if Valid then 
                   GameBoardUpdated = {Board.submitMove State.board Move}
-                  %{Board.print GameBoardUpdated}
+                  {Board.print GameBoardUpdated}
                   if {Or {HasReachedFinish GameBoardUpdated State.turn Move} {Not {HasRemainingMoves GameBoardUpdated {GetOpponent State.turn}}}} then {ShowVictoryMessage State.turn} 
                   else 
                      if State.turn == black then 
@@ -76,6 +90,18 @@ define
    fun {SetInvalidMove GameState Invalid}
       {Record.adjoinAt GameState invalid Invalid}
    end
+
+   fun {SetK GameState K}
+      {Record.adjoinAt GameState k K}
+   end
+
+   fun {IncrementPawnsRemoved GameState}
+      {Record.adjoinAt GameState i GameState.i+1}
+   end 
+
+   fun {GetRemovedPawnsAmount GameState}
+      GameState.i 
+   end 
 
    proc {ShowVictoryMessage Color}
       if Color == black then 
