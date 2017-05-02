@@ -2,6 +2,7 @@ functor
 export
    createPlayer: CreatePlayer
 import 
+   Browser(browse: Browse)
    System(printInfo: Print)
    Board at './Board.ozf'
    Rules at './rules.ozf'
@@ -121,6 +122,11 @@ define
       end 
    end
 
+
+   fun {SortMovesByValue Moves}
+      {Sort Moves fun {$ Move1 Move2} Move1.start.x < Move2.start.x end}
+   end 
+
    fun {GetDistanceToFinish GameBoard Coord Color}
       local Size in 
          Size = {Board.getRowSize GameBoard}
@@ -141,4 +147,9 @@ define
       [] black then white 
       end 
    end
+
+   Moves = [move(start: coord(x:1 y:2) dest: coord(x:1 y:2)) move(start: coord(x:5 y:2) dest: coord(x:5 y:2)) move(start: coord(x:3 y:2) dest: coord(x:3 y:2))]
+   {Browse {SortMovesByValue Moves}}
 end 
+
+
