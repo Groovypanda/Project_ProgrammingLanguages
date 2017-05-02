@@ -54,8 +54,8 @@ define
    end 
 
    fun {GetTile Board X Y}
-      local Coord=coord(x:X y:Y) in 
-         if {IsInBoundaries Board Coord} then tile(x: X y:Y type:{GetType Board X Y}) else nil end 
+      local Coord=coord(row:X col:Y) in 
+         if {IsInBoundaries Board Coord} then tile(row: X col:Y type:{GetType Board X Y}) else nil end 
       end       
    end
 
@@ -74,19 +74,19 @@ define
 
    fun {SubmitMove Board Move}
       local TmpBoard in
-      TmpBoard = {SetType Board Move.dest.x Move.dest.y {GetType Board Move.start.x Move.start.y}}
-      {SetType TmpBoard Move.start.x Move.start.y empty}
+      TmpBoard = {SetType Board Move.stop.row Move.stop.col {GetType Board Move.start.row Move.start.col}}
+      {SetType TmpBoard Move.start.row Move.start.col empty}
       end 
    end 
 
    fun {RemovePawn Board Pawn}
-   	{SetType Board Pawn.x Pawn.y empty}
+   	{SetType Board Pawn.row Pawn.col empty}
    end 
 
    fun {BoardToTiles Board}
       local BoardToTilesRecursive RowToTiles in 
          fun {RowToTiles Row RowIndex}
-            {List.mapInd Row fun {$ I T} tile(type: T x: RowIndex y: I) end}
+            {List.mapInd Row fun {$ I T} tile(type: T row: RowIndex col: I) end}
          end 
          fun {BoardToTilesRecursive Board RowIndex}
             case Board 
@@ -112,11 +112,11 @@ define
    end 
 
    fun {IsInBoundaries Board Coord}
-      {Not {Or {Or Coord.x < 1  Coord.x > {GetRowSize Board}}  {Or Coord.y < 1  Coord.y > {GetColumnSize Board}}}}
+      {Not {Or {Or Coord.row < 1  Coord.row > {GetRowSize Board}}  {Or Coord.col < 1  Coord.col > {GetColumnSize Board}}}}
    end 
 
    fun {GetNeighbouringTiles Board Coord Direction}
-      {List.filter [{GetTile Board Coord.x+Direction Coord.y} {GetTile Board Coord.x+Direction Coord.y-1} {GetTile Board Coord.x+Direction Coord.y+1}] fun {$ Tile} {Not Tile==nil} end}
+      {List.filter [{GetTile Board Coord.row+Direction Coord.col} {GetTile Board Coord.row+Direction Coord.col-1} {GetTile Board Coord.row+Direction Coord.col+1}] fun {$ Tile} {Not Tile==nil} end}
    end 
 
    proc {PrintBoard Board}
