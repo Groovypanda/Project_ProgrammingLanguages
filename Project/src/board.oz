@@ -51,6 +51,7 @@ define
 
    fun {GetType Board X Y}
       {List.nth {GetRow Board X} Y}
+   		
    end 
 
    fun {GetTile Board X Y}

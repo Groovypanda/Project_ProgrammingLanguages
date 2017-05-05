@@ -27,7 +27,8 @@ define
                {SetBoard State GameBoard}
             end 
          [] setK(K) then
-            if K>0 then {Send PlayerWhite removePawn(State.board)} end 
+
+            if K>0 then {Send PlayerWhite removePawn(State.board)} else {Send PlayerWhite doMove(State.board)} end 
             {SetK State K}
          [] removePawn(Pawn) then 
             %If the type of the pawn is not correct, no pawn will be removed. Players shouldn't cheat...
@@ -56,7 +57,7 @@ define
                   end 
                   {SetTurn {SetInvalidMove {SetBoard State GameBoardUpdated} false} {GetOpponent State.turn}}
                else 
-                  if {Not State.invalidMove} then 
+                  if {Not State.invalid} then 
                      if State.turn == black then 
                         {Send PlayerBlack doMove(State.board)}
                      else 

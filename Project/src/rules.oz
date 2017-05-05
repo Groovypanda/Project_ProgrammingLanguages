@@ -4,6 +4,7 @@ export
 	isValidMove: IsValidMove
 import 
 	BoardFunc at './board.ozf'
+   Browser(browse: Browse)
 define
 
 	fun {GetValidMoves Board Type}
@@ -67,8 +68,9 @@ define
       end 
    end 
 
-   %CBoard = {BoardFunc.createBoard 5 5}
-   %{Browse CBoard}
-   %{Browse {GetValidMoves CBoard black}}
-
+   %Board = {BoardFunc.createBoard 4 4}
+   %ValidMoves = {GetValidMoves Board black}
+   %Board1 = {BoardFunc.submitMove Board {List.nth ValidMoves 1}}
+   %{Browse Board1}
+   %{Browse {GetValidMoves Board1 white}}
 end 
