@@ -2,6 +2,7 @@ functor
 export
    createPlayer: CreatePlayer
 import 
+   System(printInfo: Print)
    Board at './Board.ozf'
    Rules at './rules.ozf'
 define
@@ -52,8 +53,10 @@ define
                end 
             end 
          % Make a move 
-         [] doMove(GameBoard) then
-            {Send Referee checkMove({CalculateMove GameBoard Color})}            
+         [] doMove(GameBoard Strikes) then
+            {Send Referee checkMove({CalculateMove GameBoard Color})}  
+         else 
+            {Print 'The given message (with its values) was not found: '}{Print {Label Msg}}{Print '\n'}
          end 
       end}  
    end 
@@ -104,7 +107,7 @@ define
          DistanceToFinish = {IntToFloat {GetDistanceToFinish GameBoard Move.stop Color}}
          %If the tile is not far, killing is more important as the enemies tile is far. 
          if {List.length {GetDiagonalEnemies GameBoard Move.start Color}} > 0 then 
-            Multiplier = 1.0 + DistanceToFinish/RowAmount
+            Multiplier = 1.0 + 2.0*(DistanceToFinish/RowAmount)
          else 
             Multiplier = 1.0 
          end

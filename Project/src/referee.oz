@@ -53,12 +53,12 @@ define
          %Remove a pawn from the board
          [] removePawn(Pawn) then 
             local GameBoardUpdated in 
-               if Pawn.type == State.turn then 
+               if {Board.getType State.board Pawn.row Pawn.col} == State.turn then 
                   GameBoardUpdated = {Board.removePawn State.board Pawn} 
                   if {GetRemovedPawnsAmount State} < 2*State.k-1 then 
                      if State.turn == white then {Send PlayerBlack removePawn(GameBoardUpdated)} else {Send PlayerWhite removePawn(GameBoardUpdated)} end 
                   else
-                     {Send PlayerWhite doMove(GameBoardUpdated)}
+                     {Send PlayerWhite doMove(GameBoardUpdated State.strikes)}
                   end 
                   {IncrementPawnsRemoved {SetTurn {SetBoard State {Board.removePawn GameBoardUpdated Pawn}} {GetOpponent State.turn}}}
                else 
@@ -78,18 +78,18 @@ define
                      if {Or {HasReachedFinish GameBoardUpdated State.turn Move} {Not {HasRemainingMoves GameBoardUpdated {GetOpponent State.turn}}}} then {ShowVictoryMessage State.turn} 
                      else 
                         if State.turn == black then 
-                           {Send PlayerWhite doMove(GameBoardUpdated)}
+                           {Send PlayerWhite doMove(GameBoardUpdated State.strikes)}
                         else 
-                           {Send PlayerBlack doMove(GameBoardUpdated)}
+                           {Send PlayerBlack doMove(GameBoardUpdated State.strikes)}
                         end 
                      end 
                      {SetTurn {SetBoard State GameBoardUpdated} {GetOpponent State.turn}}
                   else %Let the person try again if he hasn't had a second chance.
                      if State.strikes < 1 then 
                         if State.turn == black then 
-                           {Send PlayerBlack doMove(State.board)}
+                           {Send PlayerBlack doMove(State.board State.strikes)}
                         else 
-                           {Send PlayerWhite doMove(State.board)}
+                           {Send PlayerWhite doMove(State.board State.strikes)}
                         end 
                         {SetStrikes State 1}
                      else 

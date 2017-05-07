@@ -1,28 +1,58 @@
-Expected input from player for referee: 
+General explanation:
 ---------------------------------------
 
-- setSize(N M):
+- Coord: A record with 2 features: row and col. This record points to a coordinate on the board. E.g. coord(row: 1 col: 2) 
+- Pawn: A coordinate which points to a point on the board which is black or white. E.g. coord(row: 1 col: 1)
+- Move: A record with 2 features: start and stop. This record represents a move a player can (or cannot) make. 
+        The features start and stop are coordinates. E.g. move(start: coord(row: 1 col: 2) stop: coord(row:2 col: 2)) 
+- Board: A 2-dimensional list of values. Each value is an Atom which can be either white, black or empty. E.g. [[black black black] [empty empty empty] [white white white]] 
 
-This function sets the size of the gameboard. 
-N: height of board, M: width of board
+Expected input from player too referee: 
+---------------------------------------
+
+- makeBoard(N M):
+
+This message lets the referee create a new N*M board. 
+N: amount of rows
+M: amount of columns.
+
+- setK(K)
+
+This message sets the amount of pawns which will be removed by each player. 
+K: The amount of pawns to be removed by each player. K must be in [0, floor(M/2)] with M the amount of columns of the board. 
+
+- removePawn(Pawn) 
+
+Remove a pawn from the board.
+Pawn: A coordinate. This coordinate has a black/white value on the board. 
 
 - checkMove(Move): 
 
 Checks the move given by the player, if the move is correct it will be submitted on the board.
-Move is a tuple which looks like this: move(start: coord(x y) dest: coord(x y)) 
-This tuple contains a start coordinate and destination coordinate. These coordinates each contain an x and y value.
+Move: The move the active player wants to make. See general explanation for more info.
 
-Expected input from referee to player: 
+Expected input from referee too player: 
 ---------------------------------------
 
 - chooseSize(): 
 
-Let the player choose the size.
+Let the player choose the size of the board.
 
-- doMove(GameBoard):
+- doMove(GameBoard Strikes):
 
-Let the player calculate a move. 
-GameBoard: A 2-dimensional list in which each value is an atom. This atom should be black, white or empty. 
+Let the player calculate his next move. 
+GameBoard: A 2-dimensional list in which each value is an atom. This atom should be black, white or empty. See general explanation for more info.
+Strikes: The amount of incorrect moves during this turn of the player. If this value reaches 2 the player looses.
+
+- removePawn(GameBoard): 
+
+Let the player remove one of his own pawns.
+GameBoard: A 2-dimensional list in which each value is an atom. This atom should be black, white or empty. See general explanation for more info.
+
+- chooseK(GameBoard): 
+
+Let the player choose the value for K, the amount of pawns to be removed by each player.
+GameBoard: A 2-dimensional list in which each value is an atom. This atom should be black, white or empty. See general explanation for more info.
 
 
  
