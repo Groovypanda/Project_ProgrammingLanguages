@@ -3,8 +3,8 @@ General explanation:
 
 - Coord: A record with 2 features: row and col. This record points to a coordinate on the board. E.g. coord(row: 1 col: 2) 
 - Pawn: A coordinate which points to a point on the board which is black or white. E.g. coord(row: 1 col: 1)
-- Move: A record with 2 features: start and stop. This record represents a move a player can (or cannot) make. 
-        The features start and stop are coordinates. E.g. move(start: coord(row: 1 col: 2) stop: coord(row:2 col: 2)) 
+- Move: A record with 2 features: startcoord and stopcoord. This record represents a move a player can (or cannot) make. 
+        The features startcoord and stopcoord are coordinates. E.g. move(startcoord: coord(row: 1 col: 2) stopcoord: coord(row:2 col: 2)) 
 - Board: A 2-dimensional list of values. Each value is an Atom which can be either white, black or empty. E.g. [[black black black] [empty empty empty] [white white white]] 
 
 Expected input from player too referee: 

@@ -11,13 +11,13 @@ define
       local CreateValidMoves TilesToMoves in
          % Make a list of moves from a list of tiles. The moves will all have Start as starting coordinate and a move will be made for every destination coordinate in Dests.
          fun {TilesToMoves Start Dests}
-            {List.map Dests fun {$ Dest} move(start: Start stop: Dest) end}
+            {List.map Dests fun {$ Dest} move(startcoord: Start stopcoord: Dest) end}
          end  
          % This function will return a list of moves the player can make starting from the given tiles. 
          fun {CreateValidMoves Board FromTiles}
             case FromTiles 
             of X|Xs then {List.append {CreateValidMoves Board Xs} {List.filter 
-               {TilesToMoves X {BoardFunc.getNeighbouringTiles Board X {GetDirection Color}}} fun {$ Move} {IsValidMove Board Move.start Move.stop} end}}
+               {TilesToMoves X {BoardFunc.getNeighbouringTiles Board X {GetDirection Color}}} fun {$ Move} {IsValidMove Board Move.startcoord Move.stopcoord} end}}
             [] nil then nil 
             end 
          end 

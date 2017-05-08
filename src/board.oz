@@ -85,8 +85,8 @@ define
    % Update the board with the given move. 
    fun {SubmitMove Board Move}
       local TmpBoard in
-      TmpBoard = {SetType Board Move.stop.row Move.stop.col {GetType Board Move.start.row Move.start.col}}
-      {SetType TmpBoard Move.start.row Move.start.col empty}
+      TmpBoard = {SetType Board Move.stopcoord.row Move.stopcoord.col {GetType Board Move.startcoord.row Move.startcoord.col}}
+      {SetType TmpBoard Move.startcoord.row Move.startcoord.col empty}
       end 
    end 
 

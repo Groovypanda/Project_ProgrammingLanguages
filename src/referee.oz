@@ -69,7 +69,7 @@ define
             end 
          % Check the validity of the move of a player.
          [] checkMove(Move) then 
-            if {Board.getType State.board Move.start.row Move.start.col}==State.turn then 
+            if {Board.getType State.board Move.startcoord.row Move.startcoord.col}==State.turn then 
                local Valid GameBoardUpdated in 
                   Valid = {CheckMove State.board Move State.turn}
                   if Valid then 
@@ -160,7 +160,7 @@ define
 
    %Check if the player with the given color has reached the finish with the given move.
    fun {HasReachedFinish GameBoard Color Move}
-      if Color == black then Move.stop.row == {Board.getRowSize GameBoard} else Move.stop.row == 1 end        
+      if Color == black then Move.stopcoord.row == {Board.getRowSize GameBoard} else Move.stopcoord.row == 1 end        
    end 
 
    %Check if the player can make a move.
@@ -170,6 +170,6 @@ define
 
    %Check the validity of the given move made by the player with the given color.
    fun {CheckMove GameBoard Move Color}
-      {And {Board.getType GameBoard Move.start.row Move.start.col}==Color {Rules.isValidMove GameBoard Move.start Move.stop}}
+      {And {Board.getType GameBoard Move.startcoord.row Move.startcoord.col}==Color {Rules.isValidMove GameBoard Move.startcoord Move.stopcoord}}
    end   
 end 

@@ -104,9 +104,9 @@ define
       %If enemies are far, distance will be high, so it's safer to move.
       local Multiplier RowAmount DistanceToFinish Value DepthModifier CanBlockValue in
          RowAmount = {IntToFloat {Board.getRowSize GameBoard}}
-         DistanceToFinish = {IntToFloat {GetDistanceToFinish GameBoard Move.stop Color}}
+         DistanceToFinish = {IntToFloat {GetDistanceToFinish GameBoard Move.stopcoord Color}}
          %If the tile is not far, killing is more important as the enemies tile is far. 
-         if {List.length {GetDiagonalEnemies GameBoard Move.start Color}} > 0 then 
+         if {List.length {GetDiagonalEnemies GameBoard Move.startcoord Color}} > 0 then 
             Multiplier = 1.0 + 2.0*(DistanceToFinish/RowAmount)
          else 
             Multiplier = 1.0 
@@ -188,8 +188,8 @@ define
     */
    fun {CanBlockEnemyPawn GameBoard Move Color}
       local DestinationRow in 
-         DestinationRow = Move.stop.row+{GetDirection Color}
-         if {And DestinationRow > 0 {Board.getRowSize GameBoard} >= DestinationRow} then {Board.getType GameBoard DestinationRow Move.stop.col}=={GetOpponent Color} else false end 
+         DestinationRow = Move.stopcoord.row+{GetDirection Color}
+         if {And DestinationRow > 0 {Board.getRowSize GameBoard} >= DestinationRow} then {Board.getType GameBoard DestinationRow Move.stopcoord.col}=={GetOpponent Color} else false end 
       end 
    end 
 
