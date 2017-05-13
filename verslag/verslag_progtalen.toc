@@ -1,0 +1,15 @@
+\select@language {dutch}
+\contentsline {section}{\numberline {1}Introductie}{1}
+\contentsline {section}{\numberline {2}Code}{1}
+\contentsline {subsection}{\numberline {2.1}Algemeen}{1}
+\contentsline {subsection}{\numberline {2.2}Bord}{1}
+\contentsline {subsection}{\numberline {2.3}Speler}{2}
+\contentsline {subsubsection}{\numberline {2.3.1}doMove}{2}
+\contentsline {subsubsection}{\numberline {2.3.2}removePawn}{5}
+\contentsline {subsection}{\numberline {2.4}Regels}{5}
+\contentsline {subsection}{\numberline {2.5}Scheidsrechter}{5}
+\contentsline {subsection}{\numberline {2.6}Spel}{6}
+\contentsline {section}{\numberline {3}Declaratieve model}{6}
+\contentsline {section}{\numberline {4}Message-passing concurrency model}{6}
+\contentsline {section}{\numberline {5}Toevoeging van een regel}{7}
+\contentsline {section}{\numberline {6}Integratie van de code}{7}
