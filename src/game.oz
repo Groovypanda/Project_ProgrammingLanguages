@@ -1,5 +1,6 @@
 functor 
 import 
+	Opponent at 'opponent/Player.ozf'
     Player at 'player.ozf'
     Referee at 'referee.ozf'
 define 

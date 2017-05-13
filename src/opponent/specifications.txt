@@ -1,0 +1,26 @@
+—————
+The player_BrechtHendrickx file makes use of the board_BRechtHendrickx file. If this file is not in the same folder as the player_BrechtHendrickx file, it will not work
+———
+
+Player:
+A player knows its own color and the referee. This does not need to be communicated every time
+
+A player can receive the following messages:
+- chooseSize(): This method will decide the dimensions of the board and send it to the referee
+- chooseK(): The player will choose the number of pawns that need to be removed in the beginning of the game
+- removePawn(): Choose a pawn to remove from the board
+- doMove(Board Strikes): Calculate a move to be done to the given Board
+	- Board: The board to calculate the move on
+	- Strikes: The number of strikes the user already had
+———————————————————————————————--
+
+Referee:
+A referee will keep a state of the current layout of the board, the number of strikes and the player that is currently doing a move
+
+A referee can receive the following messages:
+- makeBoard(Width Height): The referee will create a board with the given dimensions and will asks player 1 how many pawns need to be removed
+- setK(Count): Sets the number of pawns that need to be removed by both players
+- removePawn(Coord): Remove the pawn on the board with the given coordinate
+	- Coord = coord(col:a row:b)
+- checkMove(Move): The move given by the player will be checked for validity and if valid, the board will be updated. Otherwise the number of strikes increases and the player has to make a new move
+	-Move = move(startcoord:coord(col:a row:b) stopcoord:coord(col:a row:b))

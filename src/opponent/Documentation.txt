@@ -1,0 +1,59 @@
+Documentation for the project of Ruben Dedecker.
+------------------------------------------------
+
+Communication standard
+----------------------
+
+
+Player method:
+--------------
+creation::
+createPlayer Referee Color
+
+choose board size::
+chooseSize()
+
+choose the amount of pawns to remove::
+chooseK(Board)
+
+choose a pawn to remove::
+removePawn(Board)
+
+choose a move::
+doMove(Board Strikes)
+
+
+Referee method:
+--------------
+creation::
+createReferee participants(Player1 Player2)
+
+set board size::
+makeBoard(Width Height)
+
+set the amount of pawns to remove::
+setK(Count)
+
+remove the chosen pawn::
+removePawn(Coord)
+
+execute a move::
+checkMove(Move)
+
+
+
+
+Legend:
+--------
+
+Board:
+List of lists
+container list contains all row lists
+
+Coord:
+tuple of row and col
+coord(row: Row col: Col)
+
+Move:
+tuple of stardcoord and stopcoord
+move(startcoord: Coord1 stopcoord: Coord2)

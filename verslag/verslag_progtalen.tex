@@ -1,0 +1,171 @@
+
+\documentclass{article}
+\usepackage[utf8]{inputenc}
+\usepackage[dutch]{babel}
+\usepackage{algpseudocode}
+\usepackage{algorithm}
+\usepackage{amsmath}
+
+\makeatletter
+\newenvironment{algoritme}[1][H]{%
+	\renewcommand{\ALG@name}{Algoritme}% Update algorithm name
+	\renewcommand{\algorithmicrequire}{\textbf{Input:}}
+	\renewcommand{\algorithmicensure}{\textbf{Output:}}
+	\begin{algorithm}[#1]%
+	}{\end{algorithm}}
+\makeatother
+\setlength{\parindent}{0pt}
+
+\newcommand{\pluseq}{\mathrel{+}=}
+\newcommand{\mineq}{\mathrel{-}=}
+
+\title{Project Programmeertalen}
+\author{Jarre Knockaert}
+\date{}
+
+\begin{document}
+\maketitle
+\newpage
+		
+\section{Introductie}
+
+Het project werd gemaakt op het besturingssysteem Windows 10. 
+Alle programmacode werd gecompileerd met behulp van Mozart 2. 
+
+\section{Code}	
+
+\subsection{Algemeen}
+
+De volgende namen voor variabelen worden doorheen de volledige code gebruikt:
+\begin{description}
+	\item[Type] stelt het type van een coördinaat in het bord voor. Deze heeft als waarde één van de volgende atomen: white, black of empty. Dit zijn tegels met resp. een witte pion, zwarte pion of een vakje zonder pion. 
+	\item[Color] stelt de kleur voor van de speler of van een pion.  Deze heeft als waarde  white of black.
+	\item[Board] is een 2-dimensionale lijst waarin elke lijst een rij voorstelt in het bord. Die lijst stelt op zich dan elke kolom voor in de huidige lijst. De waardes in de lijst zijn een \texttt{Type}.
+	\item[Coord] stelt een coördinaat in het bord voor. Dit is een record met twee features: row en col. Dit zijn elke integers. 
+	\item[Pawn] stelt een \texttt{Coord} voor waarbij de waarde van het coördinaat in het bord een \textbf{Color} is.
+	\item[Tile] is een record met 3 features: row , col en type. Dit beschrijft een coördinaat en het type van deze coördinaat.
+	\item[Move] stelt een zet voor. Dit is een record met twee features: startcoord en stopcoord. Dit zijn elk een \texttt{Coord} en stellen het startcoördinaat en stopcoördinaat voor van de zet.
+	\item[Direction] stelt een richting voor. Deze is afhankelijk van de speller. De zwarte speler heeft als direction 1 en de witte speler heeft als direction -1.
+\end{description}
+
+\subsection{Bord}
+Het bestand \texttt{board.oz} bevat alle functies om te interageren met het spelbord en bevat enkele basisfunctionaliteit: 
+\begin{description}
+	\item[CreateBoard] maakt een nieuw spelbord aan met de opgegeven dimensie's. 
+	\item[SubmitMove] bevestigt een \texttt{Move}.
+	\item[RemovePawn] verwijdert een \texttt{Pawn}.
+	\item[BoardToTiles] zet de 2-dimensionele lijst van \texttt{Type} om naar een 2-dimensionele lijst van \texttt{Tile}.
+	\item[FilterTiles] filtert een lijst van Tiles op basis van een \texttt{Type}.
+	\item[IsInBoundaries] controleert indien een een \texttt{Coord} in het bord ligt. 
+	\item[GetNeighbouringTiles] geeft de naburige \texttt{Tiles} van een \texttt{Coordinaat} op basis van een \texttt{Direction}.
+\end{description}
+Dit is geen volledige lijst, overige functionaliteit is triviaal of zijn slechts hulpfunctie's.  
+
+
+\subsection{Speler}
+Het bestand \texttt{player.oz} bevat slechts één functie zichtbaar naar de buitenwereld (een geëxporteerde functie), namelijk \textbf{CreatePlayer}. Deze functie aanvaardt de poort van de scheidsrechter en de kleur van deze speler. De functie maakt op zich een poort aan waarnaar berichten kunnen gezonden worden. De speler handelt in een aparte draad sequentieel alle berichten af. Deze berichten worden verstuurd vanuit de scheidsrechter. De speler kan de volgende berichten afhandelen:
+\begin{description}
+	\item[chooseSize()]: De speler kiest de grootte van het bord. Als grootte wordt een standaard 5x5 bord genomen. 
+	\item[doMove(GameBoard Strikes)]: De speler berekent zijn volgende zet. De speler krijgt ontvangt hiervoor een \texttt{Board} en het aantal foutieve zetten deze beurt. Deze laatste waarde wordt verder niet gebruikt. 
+	\item[removePawn(GameBoard)]: De speler verwijdert één van zijn pionnen. 
+	\item[chooseK(GameBoard)]: De speler kiest een waarde voor K, het aantal te verwijderen pionnen door iedere speler. Hiervoor wordt de maximale waarde gekozen om zoveel mogelijk plaats te creëren om de finishlijn te bereiken. Dit heeft als neveneffect dat de overige speler ook eenvoudiger de overkant kan bereiken, maar het algoritme van removePawn probeert dit te verhinderen. 
+\end{description}
+De afhandeling van \texttt{doMove} en \texttt{removePawn} verdienen wat extra uitleg. 
+
+\subsubsection{doMove}
+Het berekenen van de volgende zet gebeurt op basis van een heuristiek. De waarde van elke mogelijke zet wordt berekend, en de zet met de hoogste waarde wordt uiteindelijk gekozen. 
+Het algoritme voor het bepalen van de waarde van een move kunt wordt beschreven in algoritme \ref{alg:calculateMove}. 
+
+Het algoritme aanvaardt de move, het bord en het kleur van de speler.
+Het algoritme is opgebouwd uit 2 functies: \texttt{GetValueMove} en \texttt{SimulateMove}. Het algoritme begint met de functie GetValueMove. Op lijn \ref{alg:setmultiplier} wordt een multiplier bepaald indien de move een pion kan veroveren. Deze multiplier is groter indien de pion dicht is bij de start, aangezien de vijandige pion dan dichter bij de finish is, en dus het veroveren van deze pion belangrijk is. Op lijn \ref{alg:canblock} wordt een waarde \texttt{CanBlock} bepaald die deel zal uitmaken van de uiteindelijke \texttt{Value}. Als de pion een vijandige pion kan blokkeren door deze zet, zal deze waarde niet nul zijn. Dit betekent waarschijnlijk dat de pion zelf ook zal geblokkeerd zijn. Dus deze waarde wordt vermenigvuldigd met Multiplier in het kwadraat, zodat deze waarde slechts van groot belang is indien de vijandige pion het einde nadert. Op lijn \ref{alg:calcval} wordt de uiteindelijke waarde van de move mits één wijziging berekent. De waarde zal groot zijn indien de pion het einde nadert, hiernaast worden \texttt{Multiplier} en \texttt{CanBlock} toegevoegd aan de formule om te verhinderen dat de vijand de finish bereikt. 
+
+Als laatste wordt gecontroleerd welke effect de huidige move heeft op de waarde van de vijandige moves. Indien de waarde van de vijandige moves gemiddeld stijgt door het plaatsen van de huidige move, moet de waarde van de huidige move dalen. Om de gemiddelde waarde van de vijandige moves te berekenen wordt de functie \texttt{SimulateMove} opgeroepen. Die functie \texttt{SimulateMove} roept opnieuw \texttt{GetValueMove} op om de waardes van de vijandige moves te berekenen onder hypothese dat de move van de speler bevestigd is. Elke \texttt{GetValueMove} zal opnieuw een \texttt{SimulateMove} opnieuw oproepen. Om deze infinite loop van simulaties te vermijden wordt een diepte en maximale diepte bijgehouden die bepaalt hoe diep de simulaties mogen worden uitgevoerd. Als maximale diepte gebruik ik 2 om het rekenwerk aanvaardbaar te houden. 
+De wijziging aan de \texttt{Value} door \texttt{SimulateMove} daalt lineair met de diepte aangezien diepere simulaties minder beduidend zijn voor de huidige move. 
+
+\begin{algoritme}
+	\caption{Heuristisch algoritme om de waarde van een move te berekenen}
+	\label{alg:calculateMove}
+	\begin{algorithmic}[1]
+		\Require \texttt{Board}, \texttt{Move}, \texttt{Color}
+		\Ensure Value: de waarde van de \texttt{Move}, dit is een float.
+		\State Value $\gets$ \Call{GetValueMove}{Board Move Color 0 2}
+		\\
+		\Function{GetValueMove}{GameBoard Move Color Depth MaxDepth}
+			\State N $\gets$ aantal rijen in het bord 
+			\State M $\gets$ afstand naar de finish
+			\State Multiplier $\gets$ 1 
+			\State CanBlockValue $\gets$ 0
+			\If{de move kan een pion veroveren}
+				\State $Multiplier \gets$ $1 + 2*\frac{M}{N}$\label{alg:setmultiplier}
+			\EndIf
+			\If{de move kan een pion blokkeren}
+				\State $CanBlockValue \gets \frac{N}{4}$\label{alg:canblock}
+			\EndIf
+			\State $Value \gets Multiplier*(N-M+Multiplier*CanBlockValue)$\label{alg:calcval}
+			\If{$Depth \leq MaxDepth$}
+				\State $SimulationValue \gets$ \Call{SimulateMove}{GameBoard Move Color (Depth+1)  MaxDepth}$\div\frac{Depth+1}{2}$\label{alg:simulate}
+				\If{$Depth \mod 2$}
+					\State $Value \mineq SimulationValue$
+				\Else
+					\State $Value \pluseq SimulationValue$
+				\EndIf
+			\EndIf
+			\State \Return Value
+		\EndFunction 
+		\\
+		\Function{SimulateMove}{GameBoard Move Color Depth MaxDepth}
+			\State UpdatedGameBoard $\gets$ Gameboard met de gegeven Move bevestigd 
+			\State EnemyMoves $\gets$ de mogelijke vijandige moves.
+			\State N $\gets$ Aantal EnemyMoves 
+			\State TotalValue $\gets$ 0 
+			\State EnemyColor $\gets$ het kleur van de vijand van speler met kleur Color.
+			\ForAll{EnemyMove in EnemyMoves}
+				\State $Value \gets$ \Call{GetValueMove}{UpdatedGameBoard Move EnemyColor Depth MaxDepth}
+				\State $TotalValue \pluseq Value$ 
+			\EndFor
+			\State \Return $\frac{TotalValue}{N}$
+		\EndFunction
+	\end{algorithmic}
+\end{algoritme}
+
+\subsubsection{removePawn}
+De keuze voor het verwijderen van een pion volgt een eenvoudige heuristiek. De speler tracht pionnen te verwijderen enkel en alleen als de huidige kolom nog een vijandige pion bevat. Dit heeft als doel het verhogen van de kans dat een vijandige pion kan veroverd worden en het verlagen van de kans dat de pion geblokkeerd zal worden. 
+\subsection{Regels}
+Het bestand \texttt{rules.oz} houdt alle regels van het spel bij. Het bestand exporteert 2 functies: 
+\begin{description}
+	\item[GetValidMoves] geeft een lijst terug van alle geldige moves en maakt hiervoor gebruik van de volgende functie. 
+	\item[IsValidMove] controleert indien een move voldoet aan alle regels van het spel. Enkel indien deze functie waar teruggeeft is een move geldig en kan deze bevestigd worden. 
+\end{description}
+\subsection{Scheidsrechter}
+	Het bestand \texttt{referee.oz} stelt de scheidsrechter voor. Dit bestand exporteert de functie \texttt{CreateReferee}. Deze aanvaardt de poorten van de twee spelers. Het doel van de referee is het regelen van het spel. De \texttt{CreateReferee} functie initialiseert een poort waarnaar berichten kunnen gestuurd worden. Die berichtenstroom wordt afgehandeld in een aparte draad, de berichten zijn telkens afkomstig van de spelers. De referee houdt de staat van het spel bij, om dit te realiseren wordt gebruik gemaakt van een state transition function. Deze functie retourneert telkens de nieuwe state, die op zich dan wordt gebruikt tijdens de verwerking van het volgende bericht.
+	De referee kan de volgende berichten afhandelen: 
+	\begin{description}
+		\item[makeBoard(N M)] initialiseert een nieuw N*M bord en laat de speler een waarde kiezen voor K. 
+		\item[setK(K)] initialiseert de waarde van K met de gegeven waarde en laat de witte speler een pion verwijderen indien K groter is dan 1. Anders mag hij onmiddelijk een move doen. 
+		\item[removePawn(Pawn)] verwijdert de gegeven pion van het bord en laat de andere speler een pion verwijderen. Indien beide spelers K pionnen verwijdert hebben mag de witte speler een move doen. 
+		\item[checkMove(Move)] controleert indien de gegeven Move geldig is. Als de move niet geldig is, mag de speler een tweede poging doen (indien dit nog niet het geval was). In het andere geval wordt de move bevestigd. Als de speler nu gewonnen is, eindigt het spel, in het andere geval mag de andere speler een move doen. 
+	\end{description} 
+	Het is nu duidelijk dat de referee de flow van het spel beheert. Hij begint met het sturen van een \texttt{chooseSize()} bericht naar de speler. De speler reageert hierop met een \texttt{makeBoard(N M)} bericht. Zo verloopt het volledige spel door telkens te reageren op een bericht met een nieuw bericht. Het spel stopt indien een speler wint waarbij de scheidsrechter geen nieuwe berichten stuurt.
+\subsection{Spel}
+Het bestand \texttt{game.oz} maakt de spelers en de referee aan. Deze initialisatie is het enige nut van dit bestand. 
+
+\section{Declaratief model}
+Het declaratieve model is onafhankelijk (het resultaat is onafhankeijk van andere berekeningen) en deterministisch (gelijke inputs bieden telkens gelijke outputs). 
+Daarnaast laat het declaratieve model geen neveneffecten toe. 
+Deze drie eigenschappen minimaliseren het aantal bugs in het programma. 
+
+Het model is transparant wat ervoor zorgt dat men eenvoudig wiskundig kan redeneren over het model. Variabelen kunnen simpelweg worden gewijzigd naar hun waarde (door het determinisme) en de uitvoering zal hieronder gelijk blijven. 
+
+Als laatste heeft het declaratieve model ook als voordeel dat er kan gedefinieerd worden wat moet gebeuren i.p.v. hoe iets moet gebeuren. Dit verbetert de onderhoudbaarheid.
+
+Het probleem met dit model is dat vele problemen niet kunnen opgelost worden met een declaratieve model. Bijvoorbeeld vele problemen vereisen het bijhouden van een staat wat niet mogelijk is met het declaratieve model. 
+
+\section{Message-passing concurrency model}
+
+\section{Toevoeging van een regel}
+
+\section{Integratie van de code}
+
+\section{Conclusie}
+	
+\end{document}
