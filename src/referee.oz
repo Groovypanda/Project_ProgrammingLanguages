@@ -101,7 +101,7 @@ define
             else 
                {Print "Please only move your own pawns...\n"}
                {ShowVictoryMessage {GetOpponent State.turn}} %Player has cheated => Other player wins. 
-               State
+               Sta   te
             end 
          end 
       end}  
